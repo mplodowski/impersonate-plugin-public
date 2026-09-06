@@ -1,7 +1,5 @@
 # Impersonate Plugin
 
-![Impersonate](docs/banner.jpg)
-
 Sign in as any backend user of your [October CMS](https://octobercms.com) site — with an audit trail and
 guard rails.
 
