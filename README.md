@@ -29,6 +29,11 @@ role can and cannot reach, or check a permission setup without asking anyone for
 * Multilingual: English, Polish, German, French, Spanish, Brazilian Portuguese, Italian, Russian, Dutch and Czech
   translations included — more available on request
 
+## Requirements
+
+This plugin requires PHP 8.2 or higher and October CMS 4.0 or higher. Running its test suite and static analysis
+needs PHP 8.4.
+
 ## Why is this a paid plugin?
 
 Something that is free has little or no perceived value. Users do not commit to free products and only use them until
@@ -67,31 +72,22 @@ from [www.flaticon.com](https://www.flaticon.com/).
 
 ## Usage
 
-After installation the plugin adds an impersonate icon to every row of the backend users list under
-**Settings → Team → Administrators**. Click it, confirm, and the backend reloads as that user. A banner at the top of
-every page names the user you are viewing as, the account you are really signed in with and, when a session
-lifetime is set, a live countdown of the time left. It also offers a **Leave impersonation** button.
+After installation the plugin adds an impersonate icon to every row of **Settings → Team → Administrators**. Click
+it, confirm, and the backend reloads as that user. A banner on every page shows who you are viewing as, who you
+really are, the time left when a session lifetime is set, and a **Leave impersonation** button.
 
-Only super users and users with the `User impersonation` permission (System tab of the role editor) can impersonate.
-The permission is granted by default to super users and the built-in Developer role; other roles need it added
-explicitly through a custom role.
+Impersonating needs the `User impersonation` permission, granted by default to super users and the Developer role.
 
 ### Who cannot be impersonated
 
-An attempt is refused, and the reason shown as a flash message, when the target:
-
-- is a super user,
-- is not activated or lacks the `general.backend` permission (the session could only show an access denied page),
-- is your own account,
-- holds a permission you do not have, while the privilege escalation guard is on (super users are exempt).
-
-Starting a second impersonation while one is active is refused as well; leave the current one first.
+An attempt is refused with a flash message when the target is a super user, is your own account, is not activated
+or lacks backend access, or holds a permission you do not have while the privilege escalation guard is on. Nested
+impersonation is refused as well; leave the current one first.
 
 ## Settings
 
-The settings page is available at **Settings → Team → Impersonate** to super users, the built-in Developer role and
-users with the `Manage impersonation settings` permission. Regular impersonators cannot open it, so nobody can switch
-the safeguards off for their own session.
+**Settings → Team → Impersonate** needs the `Manage impersonation settings` permission, granted by default to super
+users and the Developer role. Impersonators without it cannot switch the safeguards off.
 
 - **Audit log** — record every impersonation attempt in the system event log. Default: on.
 - **Block privilege escalation** — refuse impersonating users who hold permissions the impersonator does not have.
@@ -101,9 +97,8 @@ the safeguards off for their own session.
 
 ## Audit log
 
-With the audit log enabled, every attempt is written to **Settings → Logs → Event Log** (needs the
-`utilities.logs` permission) as *Impersonation started*, *Impersonation stopped* or *Impersonation denied*.
-Started and stopped entries have the `info` level, denied entries `warning`. The entry details hold:
+Every attempt is written to **Settings → Logs → Event Log** as *Impersonation started*, *stopped* (`info`) or
+*denied* (`warning`) with these details:
 
 | Field          | Value                                                                                             |
 |----------------|---------------------------------------------------------------------------------------------------|
@@ -117,19 +112,14 @@ An impersonation that ends because its lifetime expired is logged as stopped, li
 
 ## Leaving impersonation
 
-The banner at the top of every backend page has a **Leave impersonation** button. The same link is shown on the
-access denied page, so an impersonated user who cannot open some page still has a way back.
-
-Should neither be reachable (for example a server error on the page), open this address directly; it shows a
-confirmation page, and confirming ends the impersonation and returns to the dashboard (replace `backend` with your
-configured backend URI):
+Use the banner button or the link on the access denied page. Should neither be reachable, open this address (with
+your backend URI) and confirm:
 
 ```
 /backend/renatio/impersonate/leave
 ```
 
-When a session lifetime is set, an impersonation that has outlived it ends on the next request and the page reloads
-as the impersonator with a notice.
+An impersonation that outlives the session lifetime ends on the next request with a notice.
 
 ## Events
 
@@ -162,8 +152,3 @@ Event::listen(Events::DENIED, function ($impersonator, $target, string $reason) 
 
 The core `model.auth.beforeImpersonate` and `model.auth.afterImpersonate` events on `Backend\Models\User` keep
 firing as well, but they know nothing about refusals or expiry.
-
-## Requirements
-
-- October CMS 4.x
-- PHP 8.2 or higher to run the plugin; PHP 8.4 or higher to run its test suite and static analysis
