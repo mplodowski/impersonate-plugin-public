@@ -10,8 +10,6 @@ guard rails.
 See every backend screen exactly as another administrator sees it. Reproduce the problem a user reports, verify what a
 role can and cannot reach, or check a permission setup without asking anyone for their password.
 
-![Impersonation banner](docs/screenshots/02-impersonation-banner.jpg)
-
 ## Features
 
 * One-click impersonation from the backend users list, with a banner on every page showing who you are viewing as,
